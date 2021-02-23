@@ -10,7 +10,7 @@ app.use(express.static('public'));
 app.use('static', express.static(__dirname + '/public'));
 
 app.get('/', (req, res) => {
-    res.send("Test")
+    res.send("Hello")
 });
 
 app.post('/api/css/scss', function (req, res) {
@@ -41,4 +41,4 @@ app.post('/api/css/less', function (req, res) {
     });
 });
 
-app.listen(port);
+app.listen(process.env.PORT || port);
