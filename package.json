@@ -1,0 +1,31 @@
+{
+  "name": "m152_aufgabens",
+  "version": "1.0.0",
+  "engines": {
+    "node": "14.15.5"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KevinvonBallmoos/multimediainhalte_in_werbeauftritt_integrieren.git"
+  },
+  "keywords": [
+    "example",
+    "heroku"
+  ],
+  "author": "kevin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KevinvonBallmoos/multimediainhalte_in_werbeauftritt_integrieren/issues"
+  },
+  "homepage": "https://github.com/KevinvonBallmoos/multimediainhalte_in_werbeauftritt_integrieren#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-sass": "^5.0.0"
+  },
+  "devDependencies": {},
+  "description": ""
+}
