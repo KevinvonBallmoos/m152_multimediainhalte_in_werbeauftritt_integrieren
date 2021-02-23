@@ -20,7 +20,11 @@ app.post('/api/css/scss', function (req, res) {
         file: "file.scss"
     }, function (err, result) {
         if (!err) {
-            res.send(result.css.toString());
+            res.send("{\n" +
+                "  \"data\": {\n" +
+                "    \"css\": \"" + result.css.toString() + "\"" + "\n" +
+                "  }\n" +
+                "}");
         } else {
             res.status(400).send(err);
         }
@@ -34,7 +38,11 @@ app.post('/api/css/less', function (req, res) {
         file: "file.less"
     }, function (err, result) {
         if (!err) {
-            res.send(result.css.toString());
+            res.send("{\n" +
+                "  \"data\": {\n" +
+                "    \"css\": \"" + result.css.toString() + "\"" + "\n" +
+                "  }\n" +
+                "}");
         } else {
             res.status(400).send(err);
         }
