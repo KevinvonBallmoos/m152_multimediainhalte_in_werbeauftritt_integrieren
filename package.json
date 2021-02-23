@@ -25,6 +25,7 @@
   "homepage": "https://github.com/KevinvonBallmoos/multimediainhalte_in_werbeauftritt_integrieren#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "less": "^4.1.1",
     "node-less": "^1.0.0",
     "node-sass": "^5.0.0"
   },
