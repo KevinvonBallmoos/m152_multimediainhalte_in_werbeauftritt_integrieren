@@ -36,7 +36,7 @@ app.post('/api/css/scss', function (req, res) {
 app.post('/api/css/less', function (req, res) {
     fs.writeFileSync('file.less', req.body.data.less, () => {
     });
-    less.render({
+    less.Parser({
         file: "file.less"
     }, function (err, result) {
         if (!err) {
