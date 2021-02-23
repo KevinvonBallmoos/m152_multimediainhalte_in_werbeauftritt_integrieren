@@ -3,7 +3,6 @@ const app = express();
 const port = 3000;
 const sass = require('node-sass');
 const fs = require("fs");
-
 const less = require('node-less');
 
 app.use(express.urlencoded({extended: true}));
@@ -20,35 +19,31 @@ app.post('/api/css/scss', function (req, res) {
     });
     sass.render({
         file: "file.scss"
-    }, function (err, result) {
-        if (!err) {
-            res.send("{\n" +
-                "  \"data\": {\n" +
-                "    \"css\": \"" + result.css.toString() + "\"" + "\n" +
-                "  }\n" +
-                "}");
+    }, function (error, root) {
+        if (!error) {
+            res.json({
+                data: {
+                    css: root.css.toString()
+                }
+            });
         } else {
-            res.status(400).send(err);
+            res.status(400).send(error);
         }
     });
 });
 
 app.post('/api/css/less', function (req, res) {
-    fs.writeFileSync('file.less', req.body.data.less, () => {
-    });
-    less.Parser({
-        file: "file.less"
-    }, function (err, result) {
-        if (!err) {
-            res.send("{\n" +
-                "  \"data\": {\n" +
-                "    \"css\": \"" + result.css.toString() + "\"" + "\n" +
-                "  }\n" +
-                "}");
+    less.Parser().parse(req.body.data.less, function (error, root) {
+        if (!error) {
+            res.json({
+                data: {
+                    css: root.toCSS()
+                }
+            });
         } else {
-            res.status(400).send(err);
+            res.status(400).send(error);
         }
     });
 });
 
-app.listen(port);
+app.listen(process.env.PORT || port);
