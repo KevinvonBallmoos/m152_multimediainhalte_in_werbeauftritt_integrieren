@@ -4,6 +4,8 @@ const port = 3000;
 const sass = require('node-sass');
 const fs = require("fs");
 
+const less = require('node-less');
+
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(express.static('public'));
@@ -34,7 +36,7 @@ app.post('/api/css/scss', function (req, res) {
 app.post('/api/css/less', function (req, res) {
     fs.writeFileSync('file.less', req.body.data.less, () => {
     });
-    sass.render({
+    less.render({
         file: "file.less"
     }, function (err, result) {
         if (!err) {
