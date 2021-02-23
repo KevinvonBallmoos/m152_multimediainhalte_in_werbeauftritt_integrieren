@@ -7,8 +7,6 @@ const less = require('node-less');
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use(express.static('public'));
-app.use('static', express.static(__dirname + '/public'));
 
 app.post('/api/css/scss', function (req, res) {
     fs.writeFileSync('file.scss', req.body.data.scss, () => {
