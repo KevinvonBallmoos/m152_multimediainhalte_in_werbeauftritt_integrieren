@@ -10,10 +10,6 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use('static', express.static(__dirname + '/public'));
 
-app.get('/', (req, res) => {
-    res.send("Hello")
-});
-
 app.post('/api/css/scss', function (req, res) {
     fs.writeFileSync('file.scss', req.body.data.scss, () => {
     });
