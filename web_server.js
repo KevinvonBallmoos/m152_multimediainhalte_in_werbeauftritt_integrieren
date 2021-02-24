@@ -3,7 +3,7 @@ const app = express();
 const port = 3000;
 const sass = require('node-sass');
 const fs = require("fs");
-const less = require('node-less');
+const less = require('less');
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
@@ -33,11 +33,11 @@ app.post('/api/css/scss', function (req, res) {
 });
 
 app.post('/api/css/less', function (req, res) {
-    less.Parser().parse(req.body.data.less, function (error, root) {
+    less.render(req.body.data.less, function (error, root) {
         if (!error) {
             res.json({
                 data: {
-                    css: root.toCSS()
+                    css: root.css
                 }
             });
         } else {
