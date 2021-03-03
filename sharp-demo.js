@@ -93,31 +93,15 @@ app.post('/api/file', upload.single('file'), function (req, res, cb) {
     res.json({
         data: {
             images: {
-                small: "http://localhost:3000/files/" + fileArray[0],
-                medium: "http://localhost:3000/files/" + fileArray[1],
-                large: "http://localhost:3000/files/" + fileArray[2],
-                thumbnail: "http://localhost:3000/files/" + fileArray[3],
-                original: "http://localhost:3000/files/" + fileArray[4]
+                small: "https://m152lb1.herokuapp.com/files/" + fileArray[0],
+                medium: "https://m152lb1.herokuapp.com/files/" + fileArray[1],
+                large: "https://m152lb1.herokuapp.com/files/" + fileArray[2],
+                thumbnail: "https://m152lb1.herokuapp.com/files/" + fileArray[3],
+                original: "https://m152lb1.herokuapp.com/files/" + fileArray[4]
             }
         }
     });
 });
-/**
- * For heroku testing
- */
-// app.post('/api/file', upload.single('file'), (req, res) => {
-//     res.json({
-//         data: {
-//             images: {
-//                 small: "https://m152lb1.herokuapp.com/files/small_",
-//                 medium: "https://m152lb1.herokuapp.com/files/medium ",
-//                 large: "https://m152lb1.herokuapp.com/files/large ",
-//                 thumbnail: "https://m152lb1.herokuapp.com/files/thumbnail ",
-//                 original: "https://m152lb1.herokuapp.com0/files/original "
-//             }
-//         }
-//     });
-// });
 var port = 3000;
 app.listen(process.env.PORT || port);
 //# sourceMappingURL=sharp-demo.js.map
