@@ -10,6 +10,10 @@ const less = require('less');
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
+/**
+ * LB 1 / 1
+ * Post request takes 'scss' Files and converts them to css files
+ */
 app.post('/api/css/scss', (req, res) => {
     sass.render({
         data: req.body.data.scss
@@ -26,6 +30,10 @@ app.post('/api/css/scss', (req, res) => {
     });
 });
 
+/**
+ * LB 1 / 1
+ * Post request takes 'less' files and converts them to css files
+ */
 app.post('/api/css/less', function (req, res) {
     less.Parser().parse(req.body.data.less, function (error, root) {
         if (!error) {
@@ -40,7 +48,11 @@ app.post('/api/css/less', function (req, res) {
     });
 });
 
-
+/**
+ * LB 1 / 2
+ * Take an Image per Post request and convert it to 5 images in different sizes,
+ * returns a link to the image, which can be opened in a browser
+ */
 let store = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, __dirname + '/uploads')
@@ -63,6 +75,10 @@ let fileArray: string[] = new Array(5);
 
 app.use('/files', express.static('files'));
 
+/**
+ * Post request takes an image and converts it to 5 images with different sizes
+ * returns a link to the image, which can be opened in a browser
+ */
 app.post('/api/file', upload.single('file'), (req, res, cb) => {
 
     for (let i = 0; i < 5; i++) {
@@ -114,6 +130,8 @@ app.post('/api/file', upload.single('file'), (req, res, cb) => {
     );
 });
 
-
+/**
+ * Web-Server Port
+ */
 const port = 3000;
 app.listen(process.env.PORT || port);
