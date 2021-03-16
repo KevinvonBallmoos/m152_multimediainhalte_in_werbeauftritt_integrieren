@@ -1,0 +1,23 @@
+a {
+    display: inline-block;
+    background: url(../../media/css_sprites.png);
+    height: 532px;
+    width: 532px;
+    overflow: hidden;
+}
+
+.black {
+    background-position:0 0;
+}
+
+.blue {
+    background-position: 532px 532px;
+}
+
+.yellow {
+    background-position: 532px 0;
+}
+
+.person {
+    background-position: 0 532px;
+}
