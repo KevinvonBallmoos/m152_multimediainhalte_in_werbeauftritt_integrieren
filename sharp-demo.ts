@@ -1,11 +1,14 @@
 import * as sharp from "sharp";
 import express = require("express");
 import multer = require("multer");
+import * as ffmpeg from "fluent-ffmpeg";
+
 
 const app = express();
 const sass = require('node-sass');
 const fs = require("fs");
 const less = require('less');
+const ffmpeg = require('fluent-ffmpeg');
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
@@ -57,14 +60,8 @@ let store = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, __dirname + '/uploads')
     },
-    filename: (req, file, cb) => {
-        if (file.mimetype.indexOf("image") > -1) {
-            cb(null, Date.now() + "_" + file.originalname)
-        } else {
-            cb({
-                error: 'Not a image file'
-            }, null)
-        }
+    filename: (req, file, callback) => {
+        callback(null, Date.now() + "_" + file.originalname)
     }
 });
 
@@ -74,6 +71,7 @@ let width;
 let fileArray: string[] = new Array(5);
 
 app.use('/files', express.static('files'));
+app.use('/uploads', express.static('uploads'));
 
 /**
  * Post request takes an image and converts it to 5 images with different sizes
@@ -129,6 +127,33 @@ app.post('/api/file', upload.single('file'), (req, res, cb) => {
         }
     );
 });
+
+app.post('/api/videos', upload.array('file'), (req, res) => {
+
+        // ffmpeg()
+        //     .mergeAdd(__dirname + '/uploads/' + req.file.filename)
+        //     .mergeAdd(__dirname + '/uploads/' + req.file.filename)
+        //     .mergeToFile(process.cwd() + '/files/' +  + req.file.filename);
+
+        // const videoBitrate = ffmpeg(__dirname + '/uploads/' + req.file.filename).videoBitrate('512k');
+        // const height = ffmpeg(__dirname + '/uploads/' + req.file.filename).videoHeight('1080');
+        // const width = ffmpeg(__dirname + '/uploads/' + req.file.filename).videoWidth('1920');
+        // const fileName = ffmpeg(__dirname + '/uploads/' + req.file.filename).fileName;
+        const turn = ffmpeg(__dirname + '/uploads/' + req.file.filename).rotate(90);
+
+
+        res.json({
+                data: {
+                    video: {
+                        location: "http://localhost:3000/uploads/" + "?turn" + turn
+                        // + "&fileName" + fileName + "&width"
+                        //     + width + "&height" + height + "&videoBitrate" + videoBitrate
+                    }
+                }
+            }
+        );
+});
+
 
 /**
  * Web-Server Port
