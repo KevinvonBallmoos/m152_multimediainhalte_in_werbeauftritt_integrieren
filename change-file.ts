@@ -1,6 +1,19 @@
-import * as ffmpeg from "fluent-ffmpeg";
+import {ffprobe} from "fluent-ffmpeg";
 
-ffmpeg()
-    .mergeAdd(process.cwd() + '/output.avi')
-    .mergeAdd(process.cwd() + '/output2.avi')
-    .mergeToFile(process.cwd() + '/merged.avi');
+var ffmpeg = require('fluent-ffmpeg');
+
+
+
+ffmpeg.ffprobe(__dirname + '/media/' + '/Apex_Win.mp4' , function (err, info) {
+    if (err) {
+        console.log(err);
+        return;
+
+    } else {
+        ffmpeg()
+            .mergeAdd(__dirname + '/media/' + '/Apex_Win.mp4')
+            .mergeAdd( __dirname + '/media/' + '/Bunker_Fight.mp4')
+            .mergeToFile(__dirname +'/Bunker_And_Win.mp4');
+    }
+
+});

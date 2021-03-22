@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../static/css/video-player.css">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+</head>
+<style>
+    button {
+        max-width: 140px;
+        margin-right: 20px;
+        text-align: center;
+        padding:10px 20px;
+        background: #1e5799;
+        background: -moz-linear-gradient(top, #1e5799 0%, #2989d8 38%, #7db9e8 100%);
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#1e5799), color-stop(38%,#2989d8), color-stop(100%,#7db9e8));
+        background: -webkit-linear-gradient(top, #1e5799 0%,#2989d8 38%,#7db9e8 100%);
+        background: -o-linear-gradient(top, #1e5799 0%,#2989d8 38%,#7db9e8 100%);
+        background: -ms-linear-gradient(top, #1e5799 0%,#2989d8 38%,#7db9e8 100%);
+        background: linear-gradient(to bottom, #1e5799 0%,#2989d8 38%,#7db9e8 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#1e5799', endColorstr='#7db9e8',GradientType=0 );
+        color:#fff;
+        -moz-border-radius:10px;
+        -webkit-border-radius:10px;
+        border-radius:10px;
+        -moz-box-shadow:0 1px 2px rgba(000,000,000,0.5),inset 0 0 2px rgba(255,255,255,0.9);
+        -webkit-box-shadow:0 1px 2px rgba(000,000,000,0.5),inset 0 0 2px rgba(255,255,255,0.9);
+        box-shadow:0 1px 2px rgba(000,000,000,0.5),inset 0 0 2px rgba(255,255,255,0.9);
+        cursor:pointer;
+        font-size: 14px;
+    }
+</style>
+<body>
+<div style="text-align: center; margin-top: 150px">
+    <video id="video" width="800" height="400">
+        <source src="../media/Bunker_And_Win.mp4" type="video/mp4">
+    </video>
+    <br>
+    <div style="text-align: center">
+    <button id="play-pause">Play / Pause</button>
+    <button id="speed-1.5">Speed x 1.5</button>
+    <button id="speed-2">Speed x 2</button>
+    <button id="mute-unmute">Mute / Unmute</button>
+    <button id="full-screen">FullScreen</button>
+    </div>
+</div>
+<script>
+    const video = document.querySelector('video');
+    document.getElementById('play-pause').addEventListener('click', function () {
+        if (video.paused)
+            video.play();
+        else
+            video.pause();
+    });
+    document.getElementById('speed-1.5').addEventListener('click', function () {
+        if(video.playbackRate === 1.5)
+            video.playbackRate = 1.0;
+        else
+            video.playbackRate = 1.5;
+    });
+    document.getElementById('speed-2').addEventListener('click', function () {
+        if(video.playbackRate === 2.0)
+            video.playbackRate = 1.0;
+        else
+            video.playbackRate = 2.0;
+    });
+    document.getElementById('mute-unmute').addEventListener('click', function () {
+        video.muted = video.muted === false;
+    });
+    document.getElementById('full-screen').addEventListener('click', function () {
+        video.requestFullscreen();
+    });
+</script>
+</body>
+</html>
