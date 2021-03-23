@@ -15,6 +15,7 @@ app.use(express.json());
 app.use('/files', express.static('files'));
 app.use('/uploads', express.static('uploads'));
 
+
 /**
  * LB 1 / 1
  * Post request takes 'scss' Files and converts them to css files
@@ -58,12 +59,24 @@ app.post('/api/css/less', function (req, res) {
  * Take an Image per Post request and convert it to 5 images in different sizes,
  * returns a link to the image, which can be opened in a browser
  */
+var fileName = '';
 let store = multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, __dirname + '/uploads')
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + '_' + file.originalname)
+        if (req.query.fileName) {
+            if (req.files.length > 1) {
+                cb(null, Date.now() + '_' + file.originalname);
+            } else {
+                file.filename = req.query.fileName.toString();
+                file.originalname = req.query.fileName.toString();
+
+                cb(null, Date.now() + '_' + file.originalname + '.mp4');
+            }
+        } else {
+            cb(null, Date.now() + '_' + file.originalname)
+        }
     }
 });
 
@@ -142,15 +155,19 @@ app.post('/api/videos', upload.array('file'), (req, res) => {
     var width = '';
     var angle = 180;
     var i = 0;
-    var fileName = '';
     var videoBitrate = '';
     var turn = '';
     var mergedVideoName = '';
 
     if (req.query.fileName) {
-        mergedVideoName = fileName;
+        if (req.files.length > 1) {
+            mergedVideoName = Date.now() + '_' + req.query.fileName.toString() + '.mp4';
+        } else {
+            fileName = req.files[i].filename;
+        }
     } else {
-        mergedVideoName = Date.now() + '_' + 'Your_Merged_Video.mp4';
+        fileName = req.files[i].filename;
+        mergedVideoName = Date.now() + '_' + 'Your_merged_File.mp4';
     }
 
     async function merge() {
@@ -171,38 +188,47 @@ app.post('/api/videos', upload.array('file'), (req, res) => {
         var queryParameters;
 
         inputFilePath = __dirname + '/uploads/' + mergedVideoName;
-        var inputFile = fs.readFileSync(inputFilePath);
 
         if (req.query.videoBitrate) {
-            var bitRate = req.query.videoBitrate.toString();
-            videoBitrate = ffmpeg(__dirname + '/uploads/' + mergedVideoName).videoBitrate(bitRate);
-            ffmpeg(__dirname + '/uploads/' + mergedVideoName).save(inputFilePath);
-            queryParameters += "&videoBitrate=" + videoBitrate;
+            var bitrate = req.query.videoBitrate.toString();
+            videoBitrate = ffmpeg(__dirname + '/uploads/' + mergedVideoName).videoBitrate(bitrate + 'k');
+            fs.writeFileSync(__dirname + "/uploads/" + mergedVideoName, fs.readFileSync(inputFilePath));
+            queryParameters = "videoBitrate=" + videoBitrate;
         }
         if (req.query.width || req.query.heigth) {
+            if (req.query.width == '') {
+                width = '?';
+            } else if (req.query.heigth == '') {
+                height = '?';
+            } else {
+                width = req.query.width.toString();
+                height = req.query.height.toString();
+            }
             ffmpeg(__dirname + '/uploads/' + mergedVideoName).size(width + 'x' + height);
-            ffmpeg(__dirname + '/uploads/' + mergedVideoName).save(inputFilePath);
+            fs.writeFileSync(__dirname + "/uploads/" + mergedVideoName, fs.readFileSync(inputFilePath));
             queryParameters += "&width=" + width + "&height=" + height;
         }
         if (req.query.fileName) {
-            fileName = mergedVideoName;
-            queryParameters += "&fileName=" + fileName;
+            fs.writeFileSync(__dirname + "/uploads/" + mergedVideoName, fs.readFileSync(inputFilePath));
+            queryParameters += "&fileName=" + mergedVideoName;
         }
         if (req.query.turn) {
-            if (ffmpeg(__dirname + '/uploads/' + mergedVideoName).turn(true)) {
+            if (req.query.turn == 'Yes') {
                 turn = 'true';
-            } else {
+            } else if (req.query.turn == 'No') {
                 turn = 'false';
             }
+            fs.writeFileSync(__dirname + "/uploads/" + mergedVideoName, fs.readFileSync(inputFilePath));
             queryParameters += "&turn=" + turn;
         }
 
-        fs.writeFileSync(__dirname + "/files/" + mergedVideoName, inputFile);
+        fs.writeFileSync(__dirname + "/files/" + mergedVideoName, fs.readFileSync(inputFilePath));
 
+        console.log(queryParameters);
         res.json({
                 data: {
                     video: {
-                        location: "http://localhost:3000/files/" + '?' + mergedVideoName + queryParameters
+                        location: "http://localhost:3000/files/" + mergedVideoName + '?' + queryParameters
 
                     }
                 }
@@ -225,56 +251,54 @@ app.post('/api/videos', upload.array('file'), (req, res) => {
     } else {
 
         i = 0;
-        inputFilePath = __dirname + '/uploads/' + req.files[0].filename;
+        inputFilePath = __dirname + '/uploads/' + req.files[i].filename;
 
         var queryParameters = '';
-        console.log(req.query.height);
+        console.log(req.query);
+        console.log(req.files[i]);
 
         if (req.query.videoBitrate) {
             var bitrate = req.query.videoBitrate.toString();
-            videoBitrate = ffmpeg(__dirname + '/uploads/' + req.files[0].filename).videoBitrate(bitrate);
+            videoBitrate = ffmpeg(__dirname + '/uploads/' + req.files[i].filename).videoBitrate(bitrate + 'k');
             fs.writeFileSync(__dirname + "/uploads/" + req.files[i].filename, fs.readFileSync(inputFilePath));
-            queryParameters += "&videoBitrate=" + videoBitrate;
+            queryParameters = "videoBitrate=" + videoBitrate;
         }
 
         if (req.query.width || req.query.heigth) {
-            if (req.query.width == ''){
+            if (req.query.width == '') {
                 width = '?';
-            }
-            else if (req.query.heigth == '') {
+            } else if (req.query.heigth == '') {
                 height = '?';
-            }
-            else {
+            } else {
                 width = req.query.width.toString();
                 height = req.query.height.toString();
             }
-            ffmpeg(__dirname + '/uploads/' + req.files[0].filename).size(width + 'x' + height);
+            ffmpeg(__dirname + '/uploads/' + req.files[i].filename).size(width + 'x' + height);
 
             fs.writeFileSync(__dirname + "/uploads/" + req.files[i].filename, fs.readFileSync(inputFilePath));
             queryParameters += "&width=" + width + "&height=" + height;
 
         }
         if (req.query.fileName) {
-            fileName = req.files[0].filename;
+            fs.writeFileSync(__dirname + "/uploads/" + req.files[i].filename, fs.readFileSync(inputFilePath));
             queryParameters += "&fileName=" + fileName;
         }
         if (req.query.turn) {
-            if (ffmpeg(__dirname + '/uploads/' + req.files[0].filename).turn(true)) {
+            if (req.query.turn == 'Yes') {
                 turn = 'true';
-            } else {
+            } else if (req.query.turn == 'No') {
                 turn = 'false';
             }
+            fs.writeFileSync(__dirname + "/uploads/" + req.files[i].filename, fs.readFileSync(inputFilePath));
             queryParameters += "&turn=" + turn;
         }
 
         fs.writeFileSync(__dirname + "/files/" + req.files[i].filename, fs.readFileSync(inputFilePath));
 
-
         res.json({
                 data: {
                     video: {
-                        location: "http://localhost:3000/files/" + req.files[0].filename + '?' + queryParameters
-
+                        location: "http://localhost:3000/files/" + fileName + '?' + queryParameters
                     }
                 }
             }
