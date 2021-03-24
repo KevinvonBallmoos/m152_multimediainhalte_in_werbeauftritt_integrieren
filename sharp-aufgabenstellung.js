@@ -47,7 +47,6 @@ var ffmpeg = require('fluent-ffmpeg');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/files', express.static('files'));
-app.use('/uploads', express.static('uploads'));
 /**
  * LB 1 / 1
  * Post request takes 'scss' Files and converts them to css files
@@ -102,7 +101,7 @@ var store = multer.diskStorage({
                 cb(null, Date.now() + '_' + file.originalname);
             }
             else {
-                file.filename = req.query.fileName.toString();
+                file.filename = Date.now() + '_' + req.query.fileName.toString() + '.mp4';
                 file.originalname = req.query.fileName.toString();
                 cb(null, Date.now() + '_' + file.originalname + '.mp4');
             }
@@ -172,12 +171,9 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
     var inputFilePath;
     var outputFilePath = __dirname + '/uploads/';
     var mergedVideo = ffmpeg();
-    var height = '';
-    var width = '';
-    var angle = 180;
+    var height = null;
+    var width = null;
     var i = 0;
-    var videoBitrate = '';
-    var turn = '';
     var mergedVideoName = '';
     if (req.query.fileName) {
         if (req.files.length > 1) {
@@ -191,6 +187,9 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
         fileName = req.files[i].filename;
         mergedVideoName = Date.now() + '_' + 'Your_merged_File.mp4';
     }
+    /**
+     * merges input
+     */
     function merge() {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -206,54 +205,40 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
             });
         });
     }
+    /**
+     * responds, when merging is successful and file is saved
+     * adds query params
+     */
     function respond() {
-        console.log(req.query);
-        var queryParameters;
         inputFilePath = __dirname + '/uploads/' + mergedVideoName;
+        var ffmpegCommand = ffmpeg(inputFilePath);
         if (req.query.videoBitrate) {
-            var bitrate = req.query.videoBitrate.toString();
-            videoBitrate = ffmpeg(__dirname + '/uploads/' + mergedVideoName).videoBitrate(bitrate + 'k');
-            fs.writeFileSync(__dirname + "/uploads/" + mergedVideoName, fs.readFileSync(inputFilePath));
-            queryParameters = "videoBitrate=" + videoBitrate;
+            var bitrate = req.query.videoBitrate;
+            ffmpegCommand = ffmpegCommand.videoBitrate(bitrate + 'k');
         }
-        if (req.query.width || req.query.heigth) {
-            if (req.query.width == '') {
-                width = '?';
-            }
-            else if (req.query.heigth == '') {
-                height = '?';
-            }
-            else {
-                width = req.query.width.toString();
-                height = req.query.height.toString();
-            }
-            ffmpeg(__dirname + '/uploads/' + mergedVideoName).size(width + 'x' + height);
-            fs.writeFileSync(__dirname + "/uploads/" + mergedVideoName, fs.readFileSync(inputFilePath));
-            queryParameters += "&width=" + width + "&height=" + height;
+        if (req.query.width && req.query.height) {
+            width = req.query.width;
+            height = req.query.height;
+            size = width + 'x' + height;
+            ffmpegCommand = ffmpegCommand.withSize(size);
         }
-        if (req.query.fileName) {
-            fs.writeFileSync(__dirname + "/uploads/" + mergedVideoName, fs.readFileSync(inputFilePath));
-            queryParameters += "&fileName=" + mergedVideoName;
+        else if (req.query.width) {
+            width = req.query.width;
+            size = width + '?x';
+            ffmpegCommand = ffmpegCommand.withSize(size);
+        }
+        else if (req.query.height) {
+            height = req.query.height;
+            size = '?x' + height;
+            ffmpegCommand = ffmpegCommand.withSize(size);
         }
         if (req.query.turn) {
-            if (req.query.turn == 'Yes') {
-                turn = 'true';
+            if (req.query.turn === 'true') {
+                ffmpegCommand = ffmpegCommand.withVideoFilter('transpose=1, transpose=1');
             }
-            else if (req.query.turn == 'No') {
-                turn = 'false';
-            }
-            fs.writeFileSync(__dirname + "/uploads/" + mergedVideoName, fs.readFileSync(inputFilePath));
-            queryParameters += "&turn=" + turn;
         }
-        fs.writeFileSync(__dirname + "/files/" + mergedVideoName, fs.readFileSync(inputFilePath));
-        console.log(queryParameters);
-        res.json({
-            data: {
-                video: {
-                    location: "http://localhost:3000/files/" + mergedVideoName + '?' + queryParameters
-                }
-            }
-        });
+        fileName = mergedVideoName;
+        saveFile(ffmpegCommand, fileName).then(function () { return jsonRespond(); }).catch(error);
     }
     function error(err) {
         console.log(err);
@@ -269,49 +254,57 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
     else {
         i = 0;
         inputFilePath = __dirname + '/uploads/' + req.files[i].filename;
-        var queryParameters = '';
-        console.log(req.query);
-        console.log(req.files[i]);
+        var ffmpegCommand = ffmpeg(inputFilePath);
         if (req.query.videoBitrate) {
-            var bitrate = req.query.videoBitrate.toString();
-            videoBitrate = ffmpeg(__dirname + '/uploads/' + req.files[i].filename).videoBitrate(bitrate + 'k');
-            fs.writeFileSync(__dirname + "/uploads/" + req.files[i].filename, fs.readFileSync(inputFilePath));
-            queryParameters = "videoBitrate=" + videoBitrate;
+            var bitrate = req.query.videoBitrate;
+            console.log(bitrate);
+            ffmpegCommand = ffmpegCommand.videoBitrate(bitrate + 'k');
         }
-        if (req.query.width || req.query.heigth) {
-            if (req.query.width == '') {
-                width = '?';
-            }
-            else if (req.query.heigth == '') {
-                height = '?';
-            }
-            else {
-                width = req.query.width.toString();
-                height = req.query.height.toString();
-            }
-            ffmpeg(__dirname + '/uploads/' + req.files[i].filename).size(width + 'x' + height);
-            fs.writeFileSync(__dirname + "/uploads/" + req.files[i].filename, fs.readFileSync(inputFilePath));
-            queryParameters += "&width=" + width + "&height=" + height;
+        var size = '';
+        if (req.query.width && req.query.height) {
+            width = req.query.width;
+            height = req.query.height;
+            size = width + 'x' + height;
+            ffmpegCommand = ffmpegCommand.withSize(size);
         }
-        if (req.query.fileName) {
-            fs.writeFileSync(__dirname + "/uploads/" + req.files[i].filename, fs.readFileSync(inputFilePath));
-            queryParameters += "&fileName=" + fileName;
+        else if (req.query.width) {
+            width = req.query.width;
+            size = width + '?x';
+            ffmpegCommand = ffmpegCommand.withSize(size);
+        }
+        else if (req.query.height) {
+            height = req.query.height;
+            size = '?x' + height;
+            ffmpegCommand = ffmpegCommand.withSize(size);
         }
         if (req.query.turn) {
-            if (req.query.turn == 'Yes') {
-                turn = 'true';
+            if (req.query.turn === 'true') {
+                ffmpegCommand = ffmpegCommand.withVideoFilter('transpose=1, transpose=1');
             }
-            else if (req.query.turn == 'No') {
-                turn = 'false';
-            }
-            fs.writeFileSync(__dirname + "/uploads/" + req.files[i].filename, fs.readFileSync(inputFilePath));
-            queryParameters += "&turn=" + turn;
         }
-        fs.writeFileSync(__dirname + "/files/" + req.files[i].filename, fs.readFileSync(inputFilePath));
+        fileName = new Date().getTime() + "_" + req.files[0].filename.split("_").slice(1).join("_");
+        saveFile(ffmpegCommand, fileName).then(function () { return jsonRespond(); }).catch(error);
+    }
+    function saveFile(ffmpegCommand, fileName) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, new Promise(function (resolve, reject) {
+                        ffmpegCommand.save(__dirname + '/files/' + fileName)
+                            .on('error', function (err) {
+                            console.log('Error' + err);
+                            reject(err);
+                        }).on('end', function () {
+                            resolve(null);
+                        });
+                    })];
+            });
+        });
+    }
+    function jsonRespond() {
         res.json({
             data: {
                 video: {
-                    location: "http://localhost:3000/files/" + fileName + '?' + queryParameters
+                    location: "http://localhost:3000/files/" + fileName
                 }
             }
         });
