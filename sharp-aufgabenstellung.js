@@ -304,7 +304,7 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
         res.json({
             data: {
                 video: {
-                    location: "http://localhost:3000/files/" + fileName
+                    location: "https://m152lb1.herokuapp.com/files/" + fileName
                 }
             }
         });
