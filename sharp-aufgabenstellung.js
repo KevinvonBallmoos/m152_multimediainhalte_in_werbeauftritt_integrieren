@@ -93,7 +93,7 @@ app.post('/api/css/less', function (req, res) {
 var fileName = '';
 var store = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, __dirname + '/uploads');
+        callback(null, process.cwd() + '/uploads');
     },
     filename: function (req, file, cb) {
         if (req.query.fileName) {
@@ -169,7 +169,7 @@ app.post('/api/file', upload.single('file'), function (req, res, cb) {
  */
 app.post('/api/videos', upload.array('file'), function (req, res) {
     var inputFilePath;
-    var outputFilePath = __dirname + '/uploads/';
+    var outputFilePath = process.cwd() + '/uploads/';
     var mergedVideo = ffmpeg();
     var height = null;
     var width = null;
@@ -210,7 +210,7 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
      * adds query params
      */
     function respond() {
-        inputFilePath = __dirname + '/uploads/' + mergedVideoName;
+        inputFilePath = process.cwd() + '/uploads/' + mergedVideoName;
         var ffmpegCommand = ffmpeg(inputFilePath);
         if (req.query.videoBitrate) {
             var bitrate = req.query.videoBitrate;
@@ -246,14 +246,14 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
     }
     if (req.files.length > 1) {
         for (i = 0; i < req.files.length; i++) {
-            mergedVideo = mergedVideo.mergeAdd(__dirname + '/uploads/' + req.files[i].filename);
+            mergedVideo = mergedVideo.mergeAdd(process.cwd() + '/uploads/' + req.files[i].filename);
         }
         merge().then(function () { return respond(); })
             .catch(error);
     }
     else {
         i = 0;
-        inputFilePath = __dirname + '/uploads/' + req.files[i].filename;
+        inputFilePath = process.cwd() + '/uploads/' + req.files[i].filename;
         var ffmpegCommand = ffmpeg(inputFilePath);
         if (req.query.videoBitrate) {
             var bitrate = req.query.videoBitrate;
@@ -289,7 +289,7 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) {
-                        ffmpegCommand.save(__dirname + '/files/' + fileName)
+                        ffmpegCommand.save(process.cwd() + '/files/' + fileName)
                             .on('error', function (err) {
                             console.log('Error' + err);
                             reject(err);
