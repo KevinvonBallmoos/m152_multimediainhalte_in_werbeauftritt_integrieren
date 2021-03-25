@@ -61,7 +61,7 @@ app.post('/api/css/less', function (req, res) {
 var fileName = '';
 let store = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, __dirname + '/uploads')
+        callback(null, process.cwd() + '/uploads')
     },
     filename: (req, file, cb) => {
         if (req.query.fileName) {
