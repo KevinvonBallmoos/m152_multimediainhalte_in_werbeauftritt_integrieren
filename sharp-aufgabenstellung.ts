@@ -61,7 +61,7 @@ app.post('/api/css/less', function (req, res) {
 var fileName = '';
 let store = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, process.cwd() + '/uploads')
+        callback(null, __dirname + '/uploads')
     },
     filename: (req, file, cb) => {
         if (req.query.fileName) {
@@ -148,7 +148,7 @@ app.post('/api/file', upload.single('file'), (req, res, cb) => {
 app.post('/api/videos', upload.array('file'), (req, res) => {
 
     let inputFilePath;
-    let outputFilePath = process.cwd() + '/uploads/';
+    let outputFilePath = __dirname + '/uploads/';
     var mergedVideo = ffmpeg();
     var height = null;
     var width = null;
@@ -186,7 +186,7 @@ app.post('/api/videos', upload.array('file'), (req, res) => {
      * adds query params
      */
     function respond() {
-        inputFilePath = process.cwd() + '/uploads/' + mergedVideoName;
+        inputFilePath = __dirname + '/uploads/' + mergedVideoName;
         var ffmpegCommand = ffmpeg(inputFilePath);
 
         if (req.query.videoBitrate) {
@@ -229,7 +229,7 @@ app.post('/api/videos', upload.array('file'), (req, res) => {
 
     if (req.files.length > 1) {
         for (i = 0; i < req.files.length; i++) {
-            mergedVideo = mergedVideo.mergeAdd(process.cwd() + '/uploads/' + req.files[i].filename);
+            mergedVideo = mergedVideo.mergeAdd(__dirname + '/uploads/' + req.files[i].filename);
         }
         merge().then(() => respond())
             .catch(error);
@@ -237,7 +237,7 @@ app.post('/api/videos', upload.array('file'), (req, res) => {
     } else {
 
         i = 0;
-        inputFilePath = process.cwd() + '/uploads/' + req.files[i].filename;
+        inputFilePath = __dirname + '/uploads/' + req.files[i].filename;
 
         var ffmpegCommand = ffmpeg(inputFilePath);
 
@@ -278,7 +278,7 @@ app.post('/api/videos', upload.array('file'), (req, res) => {
 
     async function saveFile(ffmpegCommand, fileName) {
         return new Promise((resolve, reject) => {
-            ffmpegCommand.save(process.cwd() + '/files/' + fileName)
+            ffmpegCommand.save(__dirname + '/files/' + fileName)
                 .on('error', function (err) {
                     console.log('Error' + err);
                     reject(err);
