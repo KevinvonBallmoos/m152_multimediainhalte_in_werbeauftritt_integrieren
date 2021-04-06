@@ -30,8 +30,8 @@ app.post('/api/audio', upload.fields([{
 
     res.json({
             data: {
-                audio: "http://localhost:3000/files/"  + audioFile ,
-                vtt: "http://localhost:3000/files/" + vttFile
+                audio: "https://m152lb1.herokuapp.com/files/"  + audioFile ,
+                vtt: "https://m152lb1.herokuapp.com/files/" + vttFile
             }
         }
     );
