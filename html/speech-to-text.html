@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div style="text-align: center; margin-top: 100px">
+<button onclick="start()">Starten</button>
+    <label for="voice-input"></label>
+    <input type="text" name="input" id="voice-input">
+
+<button>End</button>
+</div>
+<script>
+    var recognition = new webkitSpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onstart = function() {
+        console.log("Started");
+    };
+
+    recognition.onresult = function (event) {
+        console.log(event);
+    };
+
+    recognition.onerror = function (err) {
+        console.log(err);
+    };
+
+    recognition.onend = function () {
+        console.log("Ended");
+    };
+
+    function start() {
+        recognition.lang = "de-DE";
+        recognition.start();
+
+    }
+</script>
+
+</body>
+</html>
