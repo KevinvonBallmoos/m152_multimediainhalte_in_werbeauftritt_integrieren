@@ -14,14 +14,10 @@ let store = multer.diskStorage({
         callback(null, __dirname + '/files')
     },
     filename: (req, file, cb) => {
-
         cb(null, Date.now() + '_' + file.originalname);
-
     }
 });
-
 let upload = multer({storage: store});
-
 
 app.post('/api/audio', upload.fields([{
     name: 'vtt', maxCount: 1
@@ -39,7 +35,6 @@ app.post('/api/audio', upload.fields([{
             }
         }
     );
-
 });
 
 /**

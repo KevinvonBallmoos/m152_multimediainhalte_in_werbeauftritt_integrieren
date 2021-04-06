@@ -3,41 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
 </head>
+<style>
+    body{
+        background-color: dodgerblue;
+    }
+</style>
 <body>
-<div style="text-align: center; margin-top: 100px">
-<button onclick="start()">Starten</button>
-    <label for="voice-input"></label>
-    <input type="text" name="input" id="voice-input">
+<div style="text-align: center; margin-top: 50px">
+    <h1>Speech To Text</h1>
+    <h2>Try it out !</h2>
+</div>
 
-<button>End</button>
+<div style="text-align: center; margin-top: 100px">
+    <button class="btn-success" style="margin-right: 50px; width: 130px; height: 60px; font-size: 15px"
+            onclick="de()">Deutsch
+    </button>
+    <button class="btn-success" style="margin-right: 50px; width: 130px; height: 60px; font-size: 15px"
+            onclick="en()">Englisch
+    </button>
+    <button class="btn-success" style="width: 130px; height: 60px; font-size: 15px"
+            onclick="jpn()">Japanisch
+    </button>
+
+</div>
+<div style="text-align: center; margin-top: 100px">
+    <button onclick="start()" id="button">
+        <img src="../media/image/Mic.jpg" alt="Starten" style="width: 120px; height: 120px">
+    </button>
+</div>
+<div id="result" style="text-align: center; margin-top: 50px">
+    <p hidden aria-hidden="true">Hallo</p>
+</div>
+
+<div style="text-align: center; margin-top: 100px">
+    <button style="width: 130px; height: 60px; font-size: 15px" onclick="end()">Aufnahme Beenden</button>
 </div>
 <script>
     var recognition = new webkitSpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
 
-    recognition.onstart = function() {
-        console.log("Started");
-    };
+    window.addEventListener("DOMContentLoaded", () => {
+        const result = document.getElementById("result");
+        var p;
+        const onResult = event => {
+            result.innerHTML = "";
+            for (const res of event.results) {
+                const text = document.createTextNode(res[0].transcript);
+                p = document.createElement("p");
 
-    recognition.onresult = function (event) {
-        console.log(event);
-    };
+                p.appendChild(text);
+                result.appendChild(p);
+            }
+            p.id = "p";
 
-    recognition.onerror = function (err) {
-        console.log(err);
-    };
+            setTimeout(removeElement, 5000);
+        };
 
-    recognition.onend = function () {
-        console.log("Ended");
-    };
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.addEventListener("result", onResult);
+
+        recognition.onstart = function () {
+            console.log("Started");
+        };
+
+        recognition.onerror = function (err) {
+            console.log(err);
+        };
+
+        recognition.onend = function () {
+            console.log("Ended");
+        };
+
+
+    });
 
     function start() {
-        recognition.lang = "de-DE";
         recognition.start();
-
     }
+
+    function end() {
+        recognition.stop();
+        setTimeout(removeElement, 5000);
+    }
+
+    function de() {
+        recognition.lang = "de-DE";
+    }
+
+    function en() {
+        recognition.lang = "en-GB";
+    }
+
+    function jpn() {
+        recognition.lang = "ja-JA";
+    }
+
+    function removeElement() {
+        document.getElementById("p").remove();
+    }
+
+</script>
+<script>
+
+
 </script>
 
 </body>
