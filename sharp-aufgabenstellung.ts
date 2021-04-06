@@ -59,23 +59,34 @@ app.post('/api/css/less', function (req, res) {
  * returns a link to the image, which can be opened in a browser
  */
 var fileName = '';
+// let store = multer.diskStorage({
+// //     destination: (req, file, callback) => {
+// //         callback(null, __dirname + '/uploads')
+// //     },
+// //     filename: (req, file, cb) => {
+// //         if (req.query.fileName) {
+// //             if (req.files.length > 1) {
+// //                 cb(null, Date.now() + '_' + file.originalname);
+// //             } else {
+// //                 file.filename = Date.now() + '_' + req.query.fileName.toString() + '.mp4';
+// //                 file.originalname = req.query.fileName.toString();
+// //
+// //                 cb(null, Date.now() + '_' + file.originalname + '.mp4');
+// //             }
+// //         } else {
+// //             cb(null, Date.now() + '_' + file.originalname)
+// //         }
+// //     }
+// // });
+
 let store = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, __dirname + '/uploads')
+        callback(null, __dirname + '/files')
     },
     filename: (req, file, cb) => {
-        if (req.query.fileName) {
-            if (req.files.length > 1) {
-                cb(null, Date.now() + '_' + file.originalname);
-            } else {
-                file.filename = Date.now() + '_' + req.query.fileName.toString() + '.mp4';
-                file.originalname = req.query.fileName.toString();
 
-                cb(null, Date.now() + '_' + file.originalname + '.mp4');
-            }
-        } else {
-            cb(null, Date.now() + '_' + file.originalname)
-        }
+        cb(null, Date.now() + '_' + file.originalname);
+
     }
 });
 
@@ -270,8 +281,8 @@ app.post('/api/videos', upload.array('file'), (req, res) => {
         }
 
         fileName = new Date().getTime() + "_" + req.files[0].filename.split("_").slice(1).join("_");
-        
-        saveFile(ffmpegCommand,fileName).then(() => jsonRespond()
+
+        saveFile(ffmpegCommand, fileName).then(() => jsonRespond()
         ).catch(error);
 
     }
@@ -301,6 +312,7 @@ app.post('/api/videos', upload.array('file'), (req, res) => {
 
 
 });
+
 
 /**
  * Web-Server Port

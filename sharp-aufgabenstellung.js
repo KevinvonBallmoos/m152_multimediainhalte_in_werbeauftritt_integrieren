@@ -91,24 +91,31 @@ app.post('/api/css/less', function (req, res) {
  * returns a link to the image, which can be opened in a browser
  */
 var fileName = '';
+// let store = multer.diskStorage({
+// //     destination: (req, file, callback) => {
+// //         callback(null, __dirname + '/uploads')
+// //     },
+// //     filename: (req, file, cb) => {
+// //         if (req.query.fileName) {
+// //             if (req.files.length > 1) {
+// //                 cb(null, Date.now() + '_' + file.originalname);
+// //             } else {
+// //                 file.filename = Date.now() + '_' + req.query.fileName.toString() + '.mp4';
+// //                 file.originalname = req.query.fileName.toString();
+// //
+// //                 cb(null, Date.now() + '_' + file.originalname + '.mp4');
+// //             }
+// //         } else {
+// //             cb(null, Date.now() + '_' + file.originalname)
+// //         }
+// //     }
+// // });
 var store = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, process.cwd() + '/uploads');
+        callback(null, __dirname + '/files');
     },
     filename: function (req, file, cb) {
-        if (req.query.fileName) {
-            if (req.files.length > 1) {
-                cb(null, Date.now() + '_' + file.originalname);
-            }
-            else {
-                file.filename = Date.now() + '_' + req.query.fileName.toString() + '.mp4';
-                file.originalname = req.query.fileName.toString();
-                cb(null, Date.now() + '_' + file.originalname + '.mp4');
-            }
-        }
-        else {
-            cb(null, Date.now() + '_' + file.originalname);
-        }
+        cb(null, Date.now() + '_' + file.originalname);
     }
 });
 var upload = multer({ storage: store });
@@ -169,7 +176,7 @@ app.post('/api/file', upload.single('file'), function (req, res, cb) {
  */
 app.post('/api/videos', upload.array('file'), function (req, res) {
     var inputFilePath;
-    var outputFilePath = process.cwd() + '/uploads/';
+    var outputFilePath = __dirname + '/uploads/';
     var mergedVideo = ffmpeg();
     var height = null;
     var width = null;
@@ -210,7 +217,7 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
      * adds query params
      */
     function respond() {
-        inputFilePath = process.cwd() + '/uploads/' + mergedVideoName;
+        inputFilePath = __dirname + '/uploads/' + mergedVideoName;
         var ffmpegCommand = ffmpeg(inputFilePath);
         if (req.query.videoBitrate) {
             var bitrate = req.query.videoBitrate;
@@ -246,14 +253,14 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
     }
     if (req.files.length > 1) {
         for (i = 0; i < req.files.length; i++) {
-            mergedVideo = mergedVideo.mergeAdd(process.cwd() + '/uploads/' + req.files[i].filename);
+            mergedVideo = mergedVideo.mergeAdd(__dirname + '/uploads/' + req.files[i].filename);
         }
         merge().then(function () { return respond(); })
             .catch(error);
     }
     else {
         i = 0;
-        inputFilePath = process.cwd() + '/uploads/' + req.files[i].filename;
+        inputFilePath = __dirname + '/uploads/' + req.files[i].filename;
         var ffmpegCommand = ffmpeg(inputFilePath);
         if (req.query.videoBitrate) {
             var bitrate = req.query.videoBitrate;
@@ -289,7 +296,7 @@ app.post('/api/videos', upload.array('file'), function (req, res) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) {
-                        ffmpegCommand.save(process.cwd() + '/files/' + fileName)
+                        ffmpegCommand.save(__dirname + '/files/' + fileName)
                             .on('error', function (err) {
                             console.log('Error' + err);
                             reject(err);
