@@ -25,13 +25,11 @@ app.post('/api/audio', upload.fields([{
     name: 'audio', maxCount: 1
 }]), (req, res) => {
 
-    const vttFile = req.files['vtt'][0].filename;
-    const audioFile = req.files['audio'][0].filename;
 
     res.json({
             data: {
-                audio: "https://m152lb1.herokuapp.com/files/"  + audioFile ,
-                vtt: "https://m152lb1.herokuapp.com/files/" + vttFile
+                audio: "https://m152lb1.herokuapp.com/files/"  +  req.files['audio'][0].filename,
+                vtt: "https://m152lb1.herokuapp.com/files/" + req.files['vtt'][0].filename
             }
         }
     );
