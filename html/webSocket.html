@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="../node_modules/froala-editor/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css"/>
+    <script src="../node_modules/froala-editor/js/froala_editor.pkgd.min.js" type="text/javascript"></script>
+    <style>
+        #chat {
+            border: 1px solid black;
+            margin-bottom: 10px;
+            width: 800px;
+            margin-left: 360px;
+        }
+
+    </style>
+</head>
+<body>
+<div style="text-align: center">
+
+    <div style="margin-top: 80px; margin-right: 60px">
+        <label for="username">Username</label>
+        <input type="text" id="username">
+
+        <div style="max-width: 600px; margin-left: 460px; margin-top: 15px">
+            <label for="content"></label>
+            <textarea id="content"></textarea>
+        </div>
+    </div>
+
+    <div style="margin-top: 15px">
+        <button onclick="sendMessageToServer();">Send</button>
+    </div>
+
+    <div style="margin-top: 10px; margin-left: 620px">
+        <h4 type="text" id="error" style="color: darkred; visibility: hidden; width: 265px; text-align: center">Please
+            enter your Username and a Text !!</h4>
+    </div>
+
+    <div id="chat" onselect="removePElement();">
+
+    </div>
+</div>
+
+
+<script>
+
+    let HOST = location.origin.replace(/^http/, 'ws');
+    let ws = new WebSocket(HOST);
+    /**
+     * Get Random color
+     * @type {string}
+     */
+
+    function randomColor() {
+
+        var rndmcolor = "#";
+        for (var zaehler = 1; zaehler < 7; zaehler++) {
+            var Farbe = "0123456789ABCDEF";
+            var RND = Math.round(Math.random() * 15);
+            rndmcolor += Farbe.substr(RND, 1);
+        }
+        return rndmcolor
+    }
+
+
+    var editor = new FroalaEditor('#content');
+    let wsClient = new WebSocket('ws://localhost:8080');
+    var username;
+    var content;
+
+    function sendMessageToServer() {
+        username = document.querySelector('#username').value;
+        content = document.querySelector('#content').value;
+
+        if (!(username === "" || content === "")) {
+            document.getElementById("error").style.visibility = "hidden";
+            var text = document.getElementsByTagName('p')[1].innerHTML;
+            wsClient.send(username);
+            wsClient.send(text);
+        } else {
+            document.getElementById("error").style.visibility = "visible";
+
+        }
+    }
+
+    function removePElement() {
+        var element = document.getElementsByTagName('p')[1];
+        element.parentNode.removeChild(element);
+    }
+
+    wsClient.onopen = function (ev) {
+        console.log("Connection Established");
+        console.log(ev);
+    };
+    wsClient.onmessage = function (ev) {
+        console.log("Message received");
+        console.log(ev);
+
+        if (ev.data === "Welcome in the Chat Corner!") {
+            document.querySelector('#chat').innerHTML += "<p id='pa' style='color: black; position: static'>" + ev.data + "</p><br>";
+        }
+
+        if (ev.data === username) {
+            username = ev.data;
+            var p = document.createElement("p");
+            p.style.marginLeft = "200px";
+            p.innerHTML = username;
+            document.getElementById("chat").appendChild(p);
+        }
+
+        console.log(ev.data);
+        console.log(username);
+        console.log(content);
+        if ("<p>" + ev.data + "</p>" === content) {
+
+            var text = ev.data;
+            console.log(text);
+            var para = document.createElement("p");
+            para.style.marginLeft = "200px";
+            para.innerHTML += text;
+            para.style.color = randomColor();
+            document.getElementById("chat").appendChild(para);
+
+        }
+
+    };
+
+</script>
+</body>
+</html>
