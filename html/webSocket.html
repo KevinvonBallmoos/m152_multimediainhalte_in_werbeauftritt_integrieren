@@ -45,29 +45,13 @@
 
 <script>
 
-    let HOST = location.origin.replace(/^http/, 'ws');
-    let ws = new WebSocket(HOST);
-    /**
-     * Get Random color
-     * @type {string}
-     */
-
-    function randomColor() {
-
-        var rndmcolor = "#";
-        for (var zaehler = 1; zaehler < 7; zaehler++) {
-            var Farbe = "0123456789ABCDEF";
-            var RND = Math.round(Math.random() * 15);
-            rndmcolor += Farbe.substr(RND, 1);
-        }
-        return rndmcolor
-    }
-
-
     var editor = new FroalaEditor('#content');
     let wsClient = new WebSocket('ws://localhost:8080');
     var username;
     var content;
+    var user;
+
+
 
     function sendMessageToServer() {
         username = document.querySelector('#username').value;
@@ -76,8 +60,10 @@
         if (!(username === "" || content === "")) {
             document.getElementById("error").style.visibility = "hidden";
             var text = document.getElementsByTagName('p')[1].innerHTML;
-            wsClient.send(username);
-            wsClient.send(text);
+            // wsClient.send(username);
+            wsClient.send(JSON.stringify({username: username, content: text}));
+            // wsClient.send(text);
+
         } else {
             document.getElementById("error").style.visibility = "visible";
 
@@ -89,38 +75,50 @@
         element.parentNode.removeChild(element);
     }
 
+
+    /**
+     * Get Random color
+     * @type {string}
+     */
+
+    function randomColor() {
+
+        var colors = ['red', 'blue', 'green', 'purple', 'orange', 'yellow', 'brown', 'darkred', 'dodgerblue', 'grey'];
+        var randomNumber = Math.random() * (10 - 1) + 1;
+        return colors[Math.round(randomNumber) - 1];
+
+
+    }
+
     wsClient.onopen = function (ev) {
         console.log("Connection Established");
         console.log(ev);
     };
+
+
     wsClient.onmessage = function (ev) {
         console.log("Message received");
         console.log(ev);
 
+
         if (ev.data === "Welcome in the Chat Corner!") {
-            document.querySelector('#chat').innerHTML += "<p id='pa' style='color: black; position: static'>" + ev.data + "</p><br>";
-        }
+            document.querySelector('#chat').innerHTML += "<p id='pa' style='color: black; position: static'>" + ev.data + "</p>";
 
-        if (ev.data === username) {
-            username = ev.data;
+        } else {
+
+            var data = JSON.parse(ev.data);
+            user = data.username;
             var p = document.createElement("p");
-            p.style.marginLeft = "200px";
-            p.innerHTML = username;
+            p.innerHTML = user;
             document.getElementById("chat").appendChild(p);
-        }
 
-        console.log(ev.data);
-        console.log(username);
-        console.log(content);
-        if ("<p>" + ev.data + "</p>" === content) {
 
-            var text = ev.data;
-            console.log(text);
+            var text = data.content;
             var para = document.createElement("p");
-            para.style.marginLeft = "200px";
             para.innerHTML += text;
             para.style.color = randomColor();
             document.getElementById("chat").appendChild(para);
+
 
         }
 
