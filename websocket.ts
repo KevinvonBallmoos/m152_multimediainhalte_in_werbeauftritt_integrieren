@@ -8,7 +8,7 @@ function noop() {
 wss.on('connection', (client: WebSocket) => {
 
     client.isAlive = true;
-    client.on('pong', () => { client.isAlwive = true});
+    client.on('pong', () => { client.isAlive = true});
 
     client.on('message', data => {
         for (let client2 of Array.from(wss.clients)) {
@@ -31,6 +31,7 @@ const interval = setInterval(function ping() {
     wss.clients.forEach(function each(ws) {
 
         if (!ws.isAlive) {
+            console.log("Exit");
             ws.terminate();
         }
         ws.isAlive = false;

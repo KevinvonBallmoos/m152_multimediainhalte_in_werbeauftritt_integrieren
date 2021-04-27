@@ -6,7 +6,7 @@ function noop() {
 }
 wss.on('connection', function (client) {
     client.isAlive = true;
-    client.on('pong', function () { client.isAlwive = true; });
+    client.on('pong', function () { client.isAlive = true; });
     client.on('message', function (data) {
         for (var _i = 0, _a = Array.from(wss.clients); _i < _a.length; _i++) {
             var client2 = _a[_i];
@@ -23,6 +23,7 @@ wss.on('connection', function (client) {
 var interval = setInterval(function ping() {
     wss.clients.forEach(function each(ws) {
         if (!ws.isAlive) {
+            console.log("Exit");
             ws.terminate();
         }
         ws.isAlive = false;
