@@ -1,16 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var WebSocket = require("ws");
-var ws = require('ws');
 var wss = new WebSocket.Server({ port: 8080 });
-function heartbeat() {
-    ws.isAlive = true;
+function noop() {
 }
 wss.on('connection', function (client) {
-    client.on('pong', function () {
-        ws.isAlive = true;
-        console.log("here");
-    });
+    client.isAlive = true;
+    client.on('pong', function () { client.isAlwive = true; });
     client.on('message', function (data) {
         for (var _i = 0, _a = Array.from(wss.clients); _i < _a.length; _i++) {
             var client2 = _a[_i];
@@ -22,22 +18,18 @@ wss.on('connection', function (client) {
              .filter(client1 => client1 !== client)
              .forEach(client1 => client1.send(data));*/
     });
-    setInterval(function ping() {
-        wss.clients.forEach(function each(ws) {
-            var extWs = ws;
-            extWs.on('pong', function () {
-                console.log(extWs.isAlive);
-            });
-            if (!extWs.isAlive) {
-                console.log("Exited");
-                ws.terminate();
-            }
-            extWs.ping("test", false, function (err) {
-                console.log(err);
-            });
-            extWs.isAlive = false;
-        });
-    }, 2000);
     client.send('Welcome in the Chat Corner!');
+});
+var interval = setInterval(function ping() {
+    wss.clients.forEach(function each(ws) {
+        if (!ws.isAlive) {
+            ws.terminate();
+        }
+        ws.isAlive = false;
+        ws.ping(noop);
+    });
+}, 15000);
+wss.on('close', function () {
+    clearInterval(interval);
 });
 //# sourceMappingURL=websocket.js.map
